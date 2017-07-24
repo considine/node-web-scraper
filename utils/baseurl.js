@@ -1,5 +1,5 @@
-module.exports.url = "http://www3.nd.edu/~dchiang/teaching/nlp/2016/";
-module.exports.sitename = "David Chiang NLP";
+module.exports.url = "http://www3.nd.edu/~dwang5/courses/spring17/";
+module.exports.sitename = "David Wang SS";
 module.exports.foothold = "index.html";
 
 

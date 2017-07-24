@@ -6,7 +6,10 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "cheerio": "^1.0.0-rc.2",
+    "fs": "0.0.1-security",
+    "mkdirp": "^0.5.1",
     "mongoose": "^4.11.4",
+    "path": "^0.12.7",
     "request": "^2.81.0",
     "request-promise": "^4.2.1"
   },

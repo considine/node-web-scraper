@@ -11,7 +11,9 @@ const crawl = require("./utils/get-next");
 const siteDetails = require("./utils/baseurl");
 const baseurl = siteDetails.url;
 const siteName = siteDetails.sitename.toLowerCase().replace(/ /g, "_");
-
+const writeContents = require("./utils/write-contents");
+const getExtras = require("./utils/get-js-and-css");
+const replaceAll = require("./utils/replaceall");
 console.log(siteName);
 
 
@@ -39,10 +41,13 @@ function crawlrecurse (furl) {
 
 	// consturct url 
 	var fullUrl = siteDetails.createUrl(baseurl, furl.urlString);
-	console.log("crawling! " + fullUrl);
+	// console.log("crawling! " + fullUrl);
 	// Recurse onitself
-	rp(fullUrl)
+	rp(fullUrl, {encoding : "binary"})
 	.then((htmlstr) => {
+		htmlstr = replaceAll(htmlstr, baseurl, "");
+		writeContents.writeImage(furl.urlString, htmlstr); // save the file 
+		getExtras(htmlstr); // Get any html and css we don't have
 		refineUrl(parseBody(htmlstr))
 		.then(crawl)
 		.then(crawlrecurse)

@@ -35,7 +35,7 @@ function insertToMongoose (url) {
 	//Rely on mongoose index check to prevent duplicates. 
 
 	new Url({urlString : url}).save().then((url) => {
-		console.log(url);
+		
 	})
 	.catch((e) => {
 		
