@@ -31,34 +31,35 @@ db.on('error', function() {
  */
 function crawlrecurse (furl) {
 	
+	setTimeout(function () {
+		if (!furl) {
+			/*  We're done */
+			console.log("Done!");
+			return;
+		}
 
-	if (!furl) {
-		/*  We're done */
-		console.log("Done!");
-		return;
-	}
 
-
-	// consturct url 
-	var fullUrl = siteDetails.createUrl(baseurl, furl.urlString);
-	// console.log("crawling! " + fullUrl);
-	// Recurse onitself
-	rp(fullUrl, {encoding : "binary"})
-	.then((htmlstr) => {
-		htmlstr = replaceAll(htmlstr, baseurl, "");
-		writeContents.writeImage(furl.urlString, htmlstr); // save the file 
-		getExtras(htmlstr); // Get any html and css we don't have
-		refineUrl(parseBody(htmlstr))
-		.then(crawl)
-		.then(crawlrecurse)
+		// consturct url 
+		var fullUrl = siteDetails.createUrl(baseurl, furl.urlString);
+		// console.log("crawling! " + fullUrl);
+		// Recurse onitself
+		rp(fullUrl, {encoding : "binary"})
+		.then((htmlstr) => {
+			htmlstr = replaceAll(htmlstr, baseurl, "");
+			writeContents.writeImage(furl.urlString, htmlstr); // save the file 
+			getExtras(htmlstr); // Get any html and css we don't have
+			refineUrl(parseBody(htmlstr))
+			.then(crawl)
+			.then(crawlrecurse)
+			.catch((e) => {
+				throw new Error( (e.message) ? e.message : "Error  crawling");
+			});
+		})
 		.catch((e) => {
-			throw new Error( (e.message) ? e.message : "Error  crawling");
+			// Go to next
+			crawl().then(crawlrecurse);
 		});
-	})
-	.catch((e) => {
-		// Go to next
-		crawl().then(crawlrecurse);
-	});
+	}, 500);		
 }
 initCrawl().then(crawl).then((furl) => {
 	if (!furl) {
