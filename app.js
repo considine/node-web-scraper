@@ -1,18 +1,74 @@
-var request = require("request");
+// To Run on a new site: Change the baseurl, and change the name 
+// of the site that
+
+var rp = require('request-promise');
+var mongoose =require("mongoose");
+mongoose.Promise = require('bluebird');
 var parseBody = require("./utils/parse-body.js");
-var baseurl = "http://www3.nd.edu/~dchiang/teaching/nlp/2016/";
+var refineUrl = require('./utils/refineUrls');
+var initCrawl = require("./utils/initcrawl.js");
+const crawl = require("./utils/get-next");
+const siteDetails = require("./utils/baseurl");
+const baseurl = siteDetails.url;
+const siteName = siteDetails.sitename.toLowerCase().replace(/ /g, "_");
+
+console.log(siteName);
 
 
 //Connect to mongoose
+mongoose.connect ('mongodb://localhost/' + siteName, { useMongoClient: true });
+db = mongoose.connection;
+db.on('error', function() {
+  throw Error("Could not connect to mongoose")
+} );
 
-// Initial request
-request.get(baseurl, function(error, response, body) {
-	if (error) {
-		throw new Exception(error.message ? error.message : "Request error!");
-	}
-	var matchedArray = parseBody(body);
-	for (var i=0; i<matchedArray.length; i++) {
-		console.log(matchedArray[i].split("\"")[1]);
+/**
+ * [crawlrecurse description]
+ * @param  {[type]} furl [description]
+ * @return {[type]}      [description]
+ */
+function crawlrecurse (furl) {
+	
+
+	if (!furl) {
+		/*  We're done */
+		console.log("Done!");
+		return;
 	}
 
+
+	// consturct url 
+	var fullUrl = siteDetails.createUrl(baseurl, furl.urlString);
+	console.log("crawling! " + fullUrl);
+	// Recurse onitself
+	rp(fullUrl)
+	.then((htmlstr) => {
+		refineUrl(parseBody(htmlstr))
+		.then(crawl)
+		.then(crawlrecurse)
+		.catch((e) => {
+			throw new Error( (e.message) ? e.message : "Error  crawling");
+		});
+	})
+	.catch((e) => {
+		// Go to next
+		crawl().then(crawlrecurse);
+	});
+}
+initCrawl().then(crawl).then((furl) => {
+	if (!furl) {
+		/*  We're done */
+		console.log("Done!");
+		return;
+	}
+	crawlrecurse(furl);
+
+	
 });
+
+// rp(baseurl).then((htmlstr) => {
+// 	refineUrl(parseBody(htmlstr));
+// }).catch((err) => {
+// 	throw new Error((err.message) ?  err.message : "error on request!");
+// });
+
