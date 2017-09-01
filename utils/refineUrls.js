@@ -20,6 +20,7 @@ module.exports = (urlArray) => {
 		
 			/* Remove hashes */
 			var refinedUrl = urlArray[i].split("#")[0];
+			var refinedUrl = refinedUrl.split("?")[0];
 			if (!refinedUrl || refinedUrl.replace(/^\s+|\s+$/g, '').length === 0) continue;
 			insertToMongoose(refinedUrl);
 
