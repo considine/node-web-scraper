@@ -1,5 +1,5 @@
-module.exports.url = "http://www3.nd.edu/~dwang5/courses/spring17/";
-module.exports.sitename = "David Wang SS";
+module.exports.url = "https://webpack.js.org/";
+module.exports.sitename = "webpack";
 module.exports.foothold = "index.html";
 
 
@@ -11,7 +11,7 @@ module.exports.foothold = "index.html";
  * @return {string}   the combined url
  */
 module.exports.createUrl = (base, extension) => {
-
+	if (extension[0] === "/")  extension.slice(1, 0)
 	if (base[base.length -1] === "/") return base + extension;
 	return base + "/" + extension;
 }
