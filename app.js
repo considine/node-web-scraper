@@ -59,7 +59,7 @@ function crawlrecurse (furl) {
 			// Go to next
 			crawl().then(crawlrecurse);
 		});
-	}, 500);		
+	}, 0);		
 }
 initCrawl().then(crawl).then((furl) => {
 	if (!furl) {
